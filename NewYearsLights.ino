@@ -31,6 +31,8 @@ int LEDS[NUM_LEDS][3] = {
 };
 
 
+// set color functions - they all set a single led (numbered by index in the
+// LEDS array) to value from some color struct
 void setColor(int ledNum, LedRGB lrgb) {
   int red_pin = LEDS[ledNum][0];
   int green_pin = LEDS[ledNum][1];
@@ -119,17 +121,6 @@ RGB HSVtoRGB(HSV hsv) {
 }
 
 
-void setup() {
-  Serial.begin(9600);
-  Tlc.init();
-}
-
-void loop() {
-  alternatingGradients();
-  //tester();
-}
-
-
 // pattern functions
 void tester() {
   for (int j = 0; j < 3; j++) {
@@ -161,4 +152,16 @@ void alternatingGradients() {
       Tlc.update();
       delay(10);
     }
+}
+
+
+// setup and loop
+void setup() {
+  Serial.begin(9600);
+  Tlc.init();
+}
+
+void loop() {
+  alternatingGradients();
+  //tester();
 }
