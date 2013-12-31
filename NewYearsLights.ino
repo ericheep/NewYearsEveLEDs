@@ -1,8 +1,8 @@
 #include "Tlc5940.h"
 #include "colors.h"
 
-int time = 1;
-int debug = 1;
+int time = 1000;
+int debug = 0;
 int h = 0;
 
 #define NUM_LEDS 21
@@ -27,7 +27,7 @@ int LEDS[NUM_LEDS][3] = {
   {52, 53, 54  },
   {55, 56, 57  },
   {58, 59, 60  },
-  {61, 62, 63  },
+  {63, 62, 61  },
 };
 
 
@@ -46,13 +46,16 @@ void setColor(int ledNum, RGB rgb) {
   setColor(ledNum, lrgb);
 }
 
-// Hue 0-360, SV 0-1
 void setColor(int ledNum, HSV hsv) {
+  if (hsv.h > 359) {
+    hsv.h = hsv.h % 360;
+  }
   RGB rgb = HSVtoRGB(hsv);
   setColor(ledNum, rgb);
 }
 
 
+// color conversion functions
 LedRGB RGBtoLED(RGB rgb) {
   if(rgb.r > 1 || rgb.g > 1 || rgb.b > 1) {
     Serial.print("Exceeds expected RGB values");
@@ -76,37 +79,29 @@ RGB HSVtoRGB(HSV hsv) {
   float x = chroma * (1 - abs(remainder - 1));
   switch(int(sector)) {
   case 0:
-    rgb_p = (RGB){
-      chroma, x, 0    };
+    rgb_p = (RGB){chroma, x, 0};
     break;
   case 1:
-    rgb_p = (RGB){
-      x, chroma, 0    };
+    rgb_p = (RGB){x, chroma, 0};
     break;
   case 2:
-    rgb_p = (RGB){
-      0, chroma, x    };
+    rgb_p = (RGB){0, chroma, x};
     break;
   case 3:
-    rgb_p = (RGB){
-      0, x, chroma    };
+    rgb_p = (RGB){0, x, chroma};
     break;
   case 4:
-    rgb_p = (RGB){
-      x, 0, chroma    };
+    rgb_p = (RGB){x, 0, chroma};
     break;
   case 5:
-    rgb_p = (RGB){
-      chroma, 0, x    };
+    rgb_p = (RGB){chroma, 0, x};
     break;
   default:
-    rgb_p = (RGB){
-      0, 0, 0    };
+    rgb_p = (RGB){0, 0, 0};
   }
 
   float m = hsv.v - chroma;
-  rgb = (RGB){
-    rgb_p.r + m, rgb_p.g + m, rgb_p.b + m  };
+  rgb = (RGB){rgb_p.r + m, rgb_p.g + m, rgb_p.b + m};
 
   if(debug){
     Serial.println("HSV:");
@@ -130,17 +125,40 @@ void setup() {
 }
 
 void loop() {
-  for(int n = 0; n < NUM_LEDS; n++) {
-    Tlc.clear();
+  alternatingGradients();
+  //tester();
+}
 
-    HSV hsv = {h, 1, .1 };
-    h+5=5;
-    if(h > 360){
-      h = 0;
+
+// pattern functions
+void tester() {
+  for (int j = 0; j < 3; j++) {
+    int hue = j * 120;
+    for (int n = 0; n < NUM_LEDS; n++) {
+      Tlc.clear();
+      HSV hsv = {hue, 1, .1};
+      setColor(n, hsv);
+      Tlc.update();
+      delay(100);
     }
-
-    setColor(0, hsv);
-    Tlc.update();
-    delay(time);
   }
+}
+
+
+void alternatingGradients() {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      int n = i % 21;
+      h++;
+      HSV hsv = {120, 1, .1 };
+      if(h > 30){
+        h = 0;
+      }
+      Tlc.clear();
+      setColor(n, hsv);
+      setColor(n , hsv);
+      setColor(n + 3, hsv);
+      setColor(n + 6, hsv);
+      Tlc.update();
+      delay(10);
+    }
 }
