@@ -37,7 +37,7 @@ void setup() {
 void loop() {
   for(int n = 0; n < NUM_LEDS; n++) {
     Tlc.clear();
-    RGB rgb = {0, 255, 0};
+    RGB rgb = {MAROON};
     setColor(n, rgb);
     Tlc.update();
     delay(time);
@@ -137,11 +137,11 @@ void setColor(int ledNum, RGB rgb) {
 }
 
 LedRGB RGBtoLED(RGB rgb) {
-    if(rgb.r > 255 || rgb.g > 255 || rgb.b > 255) {
+    if(rgb.r > 1 || rgb.g > 1 || rgb.b > 1) {
       Serial.print("Exceeds expected RGB values");
     }
     else {
-      LedRGB lrgb = {rgb.r* 6, rgb.g*16, rgb.b*16};
+      LedRGB lrgb = {rgb.r*4000, rgb.g*4000, rgb.b*4000};
       return lrgb;
     }
 }
