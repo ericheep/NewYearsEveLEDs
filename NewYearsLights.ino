@@ -31,30 +31,6 @@ int LEDS[NUM_LEDS][3] = {
 };
 
 
-void setup() {
-  Serial.begin(9600);
-  Tlc.init();
-}
-
-void loop() {
-  for(int n = 0; n < NUM_LEDS; n++) {
-    Tlc.clear();
-    RGB rgb = {MAROON};
-
-    float s = float(n) / float(NUM_LEDS);
-
-    HSV hsv = {h, 1, .1};
-    h++;
-    if(h > 360){
-      h = 0;
-    }
-
-    setColor(3, hsv);
-    Tlc.update();
-    delay(time);
-  }
-}
-
 void color(int ledNum, String color) {
   int num = ledNum * 3;
   if (color == "red") {
@@ -212,4 +188,30 @@ RGB HSVtoRGB(HSV hsv) {
   }
 
   return rgb;
+}
+
+
+void setup() {
+  Serial.begin(9600);
+  Tlc.init();
+}
+
+
+void loop() {
+  for(int n = 0; n < NUM_LEDS; n++) {
+    Tlc.clear();
+    RGB rgb = {MAROON};
+
+    float s = float(n) / float(NUM_LEDS);
+
+    HSV hsv = {h, 1, .1};
+    h++;
+    if(h > 360){
+      h = 0;
+    }
+
+    setColor(3, hsv);
+    Tlc.update();
+    delay(time);
+  }
 }
