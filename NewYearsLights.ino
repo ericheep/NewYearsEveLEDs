@@ -1,7 +1,9 @@
 #include "Tlc5940.h"
 #include "colors.h"
 
-int time = 10;
+int time = 1;
+int debug = 1;
+int h = 0;
 
 #define NUM_LEDS 21
 int LEDS[NUM_LEDS][3] = {
@@ -38,7 +40,16 @@ void loop() {
   for(int n = 0; n < NUM_LEDS; n++) {
     Tlc.clear();
     RGB rgb = {MAROON};
-    setColor(n, rgb);
+
+    float s = float(n) / float(NUM_LEDS);
+
+    HSV hsv = {h, 1, .1};
+    h++;
+    if(h > 360){
+      h = 0;
+    }
+
+    setColor(3, hsv);
     Tlc.update();
     delay(time);
   }
@@ -48,12 +59,12 @@ void color(int ledNum, String color) {
   int num = ledNum * 3;
   if (color == "red") {
     Tlc.set(num,4000);
-    Tlc.set(num + 1, 0);  
+    Tlc.set(num + 1, 0);
     Tlc.set(num + 2, 0);
   }
   if (color == "redorange" || color == "orangered") {
     Tlc.set(num,4000);
-    Tlc.set(num + 1, 0);  
+    Tlc.set(num + 1, 0);
     Tlc.set(num + 2, 0);
   }
   if (color == "orange") {
@@ -73,27 +84,27 @@ void color(int ledNum, String color) {
   }
   if (color == "yellowgreen" || color == "greenyellow") {
     Tlc.set(num, 0);
-    Tlc.set(num + 1, 4000);  
+    Tlc.set(num + 1, 4000);
     Tlc.set(num + 2, 0);
   }
   if (color == "green") {
     Tlc.set(num, 0);
-    Tlc.set(num + 1, 4000);  
+    Tlc.set(num + 1, 4000);
     Tlc.set(num + 2, 0);
   }
   if (color == "greenblue" || color == "bluegreen") {
     Tlc.set(num, 0);
-    Tlc.set(num + 1, 0);  
+    Tlc.set(num + 1, 0);
     Tlc.set(num + 2, 4000);
   }
   if (color == "blue") {
     Tlc.set(num, 0);
-    Tlc.set(num + 1, 0);  
+    Tlc.set(num + 1, 0);
     Tlc.set(num + 2, 4000);
   }
   if (color == "blueviolet" || color == "violetblue") {
     Tlc.set(num, 0);
-    Tlc.set(num + 1, 0);  
+    Tlc.set(num + 1, 0);
     Tlc.set(num + 2, 4000);
   }
   if (color == "violet") {
@@ -103,7 +114,7 @@ void color(int ledNum, String color) {
   }
   if (color == "white") {
     Tlc.set(num, 4000);
-    Tlc.set(num + 1, 4000);  
+    Tlc.set(num + 1, 4000);
     Tlc.set(num + 2, 4000);
   }
 }
@@ -136,12 +147,69 @@ void setColor(int ledNum, RGB rgb) {
     setColor(ledNum, lrgb);
 }
 
+void setColor(int ledNum, HSV hsv) {
+    RGB rgb = HSVtoRGB(hsv);
+    setColor(ledNum, rgb);
+}
+
 LedRGB RGBtoLED(RGB rgb) {
-    if(rgb.r > 1 || rgb.g > 1 || rgb.b > 1) {
-      Serial.print("Exceeds expected RGB values");
-    }
-    else {
-      LedRGB lrgb = {rgb.r*4000, rgb.g*4000, rgb.b*4000};
-      return lrgb;
-    }
+  if(rgb.r > 1 || rgb.g > 1 || rgb.b > 1) {
+    Serial.print("Exceeds expected RGB values");
+  }
+  else {
+    LedRGB lrgb = {rgb.r*4000, rgb.g*4000, rgb.b*4000};
+    return lrgb;
+  }
+}
+
+
+RGB HSVtoRGB(HSV hsv) {
+  // algorithm from http://en.wikipedia.org/wiki/HSL_and_HSV#Converting_to_RGB
+  RGB rgb;
+  RGB rgb_p;
+
+  float chroma = hsv.v * hsv.s;
+  float sector = float(hsv.h) / 60.0;
+  // remainder is sector mod 2 in the real number sense
+  float remainder = sector - ((int(sector) / 2) * 2) ;
+  float x = chroma * (1 - abs(remainder - 1));
+  switch(int(sector)) {
+    case 0:
+      rgb_p = (RGB){chroma, x, 0};
+      break;
+    case 1:
+      rgb_p = (RGB){x, chroma, 0};
+      break;
+    case 2:
+      rgb_p = (RGB){0, chroma, x};
+      break;
+    case 3:
+      rgb_p = (RGB){0, x, chroma};
+      break;
+    case 4:
+      rgb_p = (RGB){x, 0, chroma};
+      break;
+    case 5:
+      rgb_p = (RGB){chroma, 0, x};
+      break;
+    default:
+      rgb_p = (RGB){0, 0, 0};
+  }
+
+  float m = hsv.v - chroma;
+  rgb = (RGB){rgb_p.r + m, rgb_p.g + m, rgb_p.b + m};
+
+  if(debug){
+    Serial.println("HSV:");
+    Serial.println(hsv.h);
+    Serial.println(hsv.s);
+    Serial.println(hsv.v);
+    Serial.println("RGB:");
+    Serial.println(rgb.r);
+    Serial.println(rgb.g);
+    Serial.println(rgb.b);
+    Serial.println("-----");
+  }
+
+  return rgb;
 }

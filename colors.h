@@ -1,7 +1,7 @@
-struct RGB {
-  int r;
-  int g;
-  int b;
+struct HSV {
+  int h;
+  float s;
+  float v;
 };
 
 struct LedRGB {
@@ -17,6 +17,8 @@ struct RGB {
 };
 
 LedRGB RGBtoLED(RGB rgb);
+RGB HSVtoRGB(HSV hsv);
+void setColor(int ledNum, HSV hsv);
 void setColor(int ledNum, RGB rgb);
 
 
