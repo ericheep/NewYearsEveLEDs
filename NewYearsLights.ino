@@ -80,26 +80,26 @@ RGB HSVtoRGB(HSV hsv) {
   float remainder = sector - ((int(sector) / 2) * 2) ;
   float x = chroma * (1 - abs(remainder - 1));
   switch(int(sector)) {
-  case 0:
-    rgb_p = (RGB){chroma, x, 0};
-    break;
-  case 1:
-    rgb_p = (RGB){x, chroma, 0};
-    break;
-  case 2:
-    rgb_p = (RGB){0, chroma, x};
-    break;
-  case 3:
-    rgb_p = (RGB){0, x, chroma};
-    break;
-  case 4:
-    rgb_p = (RGB){x, 0, chroma};
-    break;
-  case 5:
-    rgb_p = (RGB){chroma, 0, x};
-    break;
-  default:
-    rgb_p = (RGB){0, 0, 0};
+    case 0:
+      rgb_p = (RGB){chroma, x, 0};
+      break;
+    case 1:
+      rgb_p = (RGB){x, chroma, 0};
+      break;
+    case 2:
+      rgb_p = (RGB){0, chroma, x};
+      break;
+    case 3:
+      rgb_p = (RGB){0, x, chroma};
+      break;
+    case 4:
+      rgb_p = (RGB){x, 0, chroma};
+      break;
+    case 5:
+      rgb_p = (RGB){chroma, 0, x};
+      break;
+    default:
+      rgb_p = (RGB){0, 0, 0};
   }
 
   float m = hsv.v - chroma;
