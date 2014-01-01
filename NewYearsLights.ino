@@ -39,6 +39,7 @@ int LEDS[NUM_LEDS][3] = {
 // set color functions - they all set a single led (numbered by index in the
 // LEDS array) to value from some color struct
 void setColor(int ledNum, LedRGB lrgb) {
+  ledNum = ledNum % NUM_LEDS;
   int red_pin = LEDS[ledNum][0];
   int green_pin = LEDS[ledNum][1];
   int blue_pin = LEDS[ledNum][2];
@@ -163,25 +164,44 @@ void tester() {
   }
 }
 
-
-void alternatingGradients() {
-    for (int i = 0; i < NUM_LEDS; i++) {
+void cyclingGradients() {
+  int c = random(0,360);  
+  int loopTime = random(2,30);
+  for (int i = 0; i < NUM_LEDS; i++) {
       int n = i % 21;
       h++;
-      HSV hsv = {120, 1, .1 };
-      if(h > 30){
-        h = 0;
-      }
       Tlc.clear();
-      setColor(n, hsv);
-      setColor(n , hsv);
-      setColor(n + 3, hsv);
-      setColor(n + 6, hsv);
-      Tlc.update();
-      delay(10);
+      for (int j = 0; j < 120; j++) {
+        Tlc.clear();
+        HSV hsv1 = {j + c - 5, 1, .5 };
+        HSV hsv2 = {j + c - 10, 1, .5 };
+        HSV hsv3 = {j + c - 15, 1, .5 };
+        HSV hsv4 = {j + c - 20, 1, .5 };
+        HSV hsv5 = {j + c - 25, 1, .5 };
+        if (j > 5 && j < 100) setColor(n, hsv1);
+        if (j > 10 && j < 105) setColor(n + 4, hsv2);
+        if (j > 15 && j < 110) setColor(n + 10, hsv1);
+        if (j > 20 && j < 115) setColor(n + 14, hsv2);
+        if (j > 25 && j < 120) setColor(n + 18, hsv2);
+        Tlc.update();
+        delay(loopTime);  
+      }
+      delay(1);
     }
 }
 
+void randomGradients() {
+  for (int i = 0; i < 25; i++) {
+    for (int n = 0; n < 5; n++) {
+      HSV hsv = {0, 1, .5};
+      setColor(random(0,NUM_LEDS), hsv);
+      Tlc.update();
+      delay(100);  
+    }     
+    Tlc.clear();
+    Tlc.update();
+  }
+}
 
 void doubleRainbow() {
   for(int h = 0; h < 720; h+=1) {
@@ -191,7 +211,6 @@ void doubleRainbow() {
   }
 }
 
-
 // setup and loop
 void setup() {
   Serial.begin(9600);
@@ -199,7 +218,9 @@ void setup() {
 }
 
 void loop() {
-  //alternatingGradients();
+  //randomGradients();
+  //cyclingGradients();
   //tester();
-  doubleRainbow();
+  //doubleRainbow();
 }
+
