@@ -5,6 +5,11 @@ int time = 1000;
 int debug = 0;
 int h = 0;
 
+// global value for smoother set_all behavior (between calls of setAll())
+int _set_all_led_num = 0;
+
+#define MAX_AT_ONCE 6
+
 #define NUM_LEDS 21
 int LEDS[NUM_LEDS][3] = {
   {0, 1, 2 },
@@ -54,6 +59,29 @@ void setColor(int ledNum, HSV hsv) {
   }
   RGB rgb = HSVtoRGB(hsv);
   setColor(ledNum, rgb);
+}
+
+// sets all LEDs to hsv value for a duration of ms
+void setAll(HSV hsv, long ms) {
+  int cycles = (NUM_LEDS / MAX_AT_ONCE) + 1;
+  long start = millis();
+  int delay_time = 1;
+
+  while((millis() - start) < ms) {
+    for (int cycle = 0; cycle < cycles; cycle++) {
+      Tlc.clear();
+      for(int i = 0; i < MAX_AT_ONCE; i++) {
+        // increment led number, reset to 0 at max
+        _set_all_led_num = ++_set_all_led_num % NUM_LEDS;
+        setColor(_set_all_led_num, hsv);
+      }
+      Tlc.update();
+      delayMicroseconds(1000);
+    }
+  }
+  Tlc.clear();
+  Tlc.update();
+  return;
 }
 
 
@@ -155,6 +183,15 @@ void alternatingGradients() {
 }
 
 
+void doubleRainbow() {
+  for(int h = 0; h < 720; h+=1) {
+     HSV hsv = {h, 1, 1 };
+     setAll(hsv, 100);
+     Serial.println(h);
+  }
+}
+
+
 // setup and loop
 void setup() {
   Serial.begin(9600);
@@ -162,6 +199,7 @@ void setup() {
 }
 
 void loop() {
-  alternatingGradients();
+  //alternatingGradients();
   //tester();
+  doubleRainbow();
 }
