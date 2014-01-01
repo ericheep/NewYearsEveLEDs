@@ -18,8 +18,10 @@ struct RGB {
 
 LedRGB RGBtoLED(RGB rgb);
 RGB HSVtoRGB(HSV hsv);
+
 void setColor(int ledNum, HSV hsv);
 void setColor(int ledNum, RGB rgb);
+void setColor(int ledNum, LedRGB lrgb);
 
 
 // list of color names - lefted from POVRAY

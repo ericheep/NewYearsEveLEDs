@@ -72,7 +72,6 @@ void setAll(HSV hsv, long ms) {
     for (int cycle = 0; cycle < cycles; cycle++) {
       Tlc.clear();
       for(int i = 0; i < MAX_AT_ONCE; i++) {
-        // increment led number, reset to 0 at max
         _set_all_led_num = ++_set_all_led_num % NUM_LEDS;
         setColor(_set_all_led_num, hsv);
       }
@@ -134,7 +133,7 @@ RGB HSVtoRGB(HSV hsv) {
   float m = hsv.v - chroma;
   rgb = (RGB){rgb_p.r + m, rgb_p.g + m, rgb_p.b + m};
 
-  if(debug){
+  if(debug == 1){
     Serial.println("HSV:");
     Serial.println(hsv.h);
     Serial.println(hsv.s);
@@ -147,6 +146,20 @@ RGB HSVtoRGB(HSV hsv) {
   }
 
   return rgb;
+}
+
+
+// returns a random HSV
+HSV randomHSV() {
+  return  randomHSV(0, 360, .4, 1, .4, 1);
+}
+
+
+HSV randomHSV(int minH, int maxH, float minS, float maxS, float minV, float maxV) {
+  int h = random(minH, maxH);
+  float s = (random(int(minS * 1000), int(maxS * 1000)) / 1000.0);
+  float v = (random(int(minV * 1000), int(maxV * 1000)) / 1000.0);
+  return (HSV){h, s, v};
 }
 
 
@@ -245,6 +258,63 @@ void single() {
   }
 }    
 
+void walkDrop() {
+  int current_leds[MAX_AT_ONCE];
+  HSV current_hsvs[MAX_AT_ONCE];
+  long current_ttls[MAX_AT_ONCE];
+
+  int max_ttl = 2000;
+  int min_ttl = 2000;
+  float minS = .2;
+  float maxS = 1;
+  float minV = .4;
+  float maxV = .6;
+
+
+  for (int i = 0; i < MAX_AT_ONCE; i++) {
+    current_leds[i] = random(0, NUM_LEDS);
+    current_hsvs[i] = randomHSV(0, 360, minS, maxS, minV, maxV);
+    current_ttls[i] = random(min_ttl, max_ttl);
+  }
+
+  Tlc.clear();
+  for (int t = 0; t < 3000; t++) {
+    Tlc.clear();
+    for (int i = 0; i < MAX_AT_ONCE; i++) {
+      int change = 0;
+      int glow = 0;
+
+      if (glow) {
+         current_hsvs[i].v += .01;
+         if(current_hsvs[i].v > 1) {
+           change = 1;
+         }
+      }
+      else {
+         current_hsvs[i].v -= .01;
+         if(current_hsvs[i].v < 0) {
+           change = 1;
+         }
+      }
+      current_ttls[i] -= 1;
+      if(current_ttls[i] < 0) {
+         change = 1;
+      }
+
+      if (change) {
+        current_leds[i] = random(0, NUM_LEDS);
+        current_hsvs[i] = randomHSV(0, 360, minS, maxS, minV, maxV);
+        current_ttls[i] = random(min_ttl, max_ttl);
+      }
+      setColor(current_leds[i], current_hsvs[i]);
+
+    }
+    Tlc.update();
+    delay(10);
+  }
+}
+
+
 // setup and loop
 void setup() {
   Serial.begin(9600);
@@ -252,11 +322,11 @@ void setup() {
 }
 
 void loop() {
+  //tester();
   patches();
   single();
+  walkDrop();
   randomPatches();
   cyclingGradients();
-  //tester();
-  //doubleRainbow();
+  doubleRainbow();
 }
-
