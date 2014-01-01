@@ -186,14 +186,34 @@ void cyclingGradients() {
         Tlc.update();
         delay(loopTime);  
       }
-      delay(1);
-    }
+   }
 }
 
-void randomGradients() {
-  for (int i = 0; i < 25; i++) {
+void patches() {
     for (int n = 0; n < 5; n++) {
-      HSV hsv = {0, 1, .5};
+      int h = random(0,360);
+      for (int m = 0; m < 50; m++) {
+        Tlc.clear();
+        HSV hsv = {m + h, 1, .5 };
+        setColor(random(0,NUM_LEDS), hsv);
+        setColor(random(0,NUM_LEDS), hsv);
+        setColor(random(0,NUM_LEDS), hsv);   
+        setColor(random(0,NUM_LEDS), hsv);
+        setColor(random(0,NUM_LEDS), hsv);
+        setColor(random(0,NUM_LEDS), hsv);       
+        Tlc.update();
+        delay(100);  
+    }     
+    Tlc.clear();
+    Tlc.update();
+  }
+}
+    
+void randomPatches() {
+  for (int i = 0; i < 25; i++) {
+    int h = random(0,360);
+    for (int n = 0; n < 5; n++) {
+      HSV hsv = {h, 1, .5};
       setColor(random(0,NUM_LEDS), hsv);
       Tlc.update();
       delay(100);  
@@ -211,6 +231,20 @@ void doubleRainbow() {
   }
 }
 
+void single() {
+  int i = 0;
+  for (int i = 0; i < 24; i++) {
+    for(int n = 0; n < 360; n++) {
+    Tlc.clear();
+    i++;
+    HSV hsv = {i, 1, 1 };
+    setColor(random(0,NUM_LEDS), hsv);
+    Tlc.update();
+    delay(random(50,100));
+    }  
+  }
+}    
+
 // setup and loop
 void setup() {
   Serial.begin(9600);
@@ -218,8 +252,10 @@ void setup() {
 }
 
 void loop() {
-  //randomGradients();
-  //cyclingGradients();
+  patches();
+  single();
+  randomPatches();
+  cyclingGradients();
   //tester();
   //doubleRainbow();
 }
