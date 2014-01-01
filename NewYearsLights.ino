@@ -278,7 +278,7 @@ void walkDrop() {
   }
 
   Tlc.clear();
-  for (int t = 0; t < 10000; t++) {
+  for (int t = 0; t < 3000; t++) {
     Tlc.clear();
     for (int i = 0; i < MAX_AT_ONCE; i++) {
       int change = 0;
@@ -325,9 +325,8 @@ void loop() {
   //tester();
   patches();
   single();
+  walkDrop();
   randomPatches();
   cyclingGradients();
-  //doubleRainbow();
-  walkDrop();
+  doubleRainbow();
 }
-
