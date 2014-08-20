@@ -1,8 +1,7 @@
-NewYearsEveLEDs
+Jellybones
 ===============
 
-Behold!
-
+A quick project for 2013's New Years, to be improved for the coming year.
 
 Requirements
 ============
